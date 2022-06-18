@@ -1,130 +1,26 @@
-![UFF Image](http://fs5.directupload.net/images/170302/d5zleuc5.png)
-# UFFRemover
+This prototype mainly focuses on slimming JavaScript by identifying and removing unused foreign functions (UFF). The prototype is developed using Node.js execution environment (>= v6.1.0). The following steps are needed for running the tool:
 
-UFFRemover is a slimming JavaScript tool for identifying and removing unused foreign functions (UFF).
+Install Node.js environment Install the project dependencies (npm install)
 
-## Installation
+We have used a sample website which is hosted on web by using hiroku (https://aliptwebsite.herokuapp.com/)
 
-UFFRemover is developed using Node.js execution environment (>= v6.1.0). The following steps are needed for running the tool:
+First, we go to the path of the project(math.js) to optimize by using following 
+command cd [D:\fidelity\UFFRemover-master]
 
-#### 1. Install Node.js environment
-Node.js can be downloaded from (https://nodejs.org)
+After that We have instrumented the java script code of sample website using the following command 
+node [D:\fidelity\UFFRemover-master] instrument_file [math.js]
 
-#### 2. Download the project from github
+This step generates a new file, math-instrumented.js .Replace original file with instrumented file To generate profiling information, We replaced sample site the original file with the instrumented file. 
+For Example: Replace
+ <script src="math.js"></script> 
+ with
+ <script src="math-instrumented.js"></script>
 
-    git clone git://github.com/hcvazquez/UFFRemover.git
-    cd UFFRemover
+Next step is generating profiling info, We ran the application and used it. This step prints profiling information about used functions into the browser console. After that We saved this information, for this step, open the browser console and save the content into a txt file(profiling).
 
-#### 3. Install the project dependencies
+Now, We can use the registered information to optimize your application.
+The optimization removes the unused foreign functions from the js file optimized. All the functions removed are listed in a folder created by the tool called "uff" in the same folder in which the optimized file is located. To avoid potential runtime errors owing to functions removed wrongly, UFFRemover replace the functions with an AJAX synchronous call that dynamically load the function from the server in case of need it.
 
-    npm install
-
-## Optimization
-
-#### 1. Go to the path of the project to optimize
-
-> If you don't have one, you can try downloading the Math.js experiment example from https://github.com/hcvazquez/ExperimentExample and following the instructions to run a local server.
-
-For Example:
-	cd [project_to_optimize_path]
-
-#### 2. Instrument your js code using the following command
-
-	node [UFF_path] instrument_file [file_to_instrument]
-
-For Example:
-	node ../../UFFRemover instrument_file bundle.js
-	node ../UFFRemover-master instrument_file math.js
-
-> This step generates a new file, e.g. bundle-instrumented.js
-
-In math.js example:
-
-![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/instrument.png)
-
-#### 3. Replace original file with instrumented file
-
-To generate profiling info you need to replace in your site the original file with the instrumented file.
-
-For Example:
-Replace
-	<script src="bundle.js"></script>
-With
-	<script src="bundle-instrumented.js"></script>
-
-In math.js example:
-
-![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/replace-instrumented.png)
-
-#### 5. Generate profiling info
-
-You need to run your application and use it. This step print profiling information about used functions into the browser console.
-
-#### 6. Save the browser console output into a file
-
-For this step, you need to open the browser console and save the content into a txt file.
-
-> Note: In Chrome, please check that "info" logging level is enable. ![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/hide_all.png)
-
-In math.js example:
-
-![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/profiling.png)
-
-#### 7. Now, you can use the registered information to optimize your application
-
-How the optimizations works?
-The optimization removes the UFFs functions from the js file optimized. All the functions removed are listed in a folder created by the tool called "uff" in the same folder in which the optimized file is located. To avoid potential runtime errors owing to functions removed wrongly, UFFRemover replace the functions with an AJAX synchronous call that dinamically load the function from the server in case of need it.
-
-> Note: The file to optimize needs to be the original file.
-
-You can optimize your original file as follow.
-
-	node [UFF_path] optimize_file_browser [file_to_optimize] [profiling_file]
-
-For Example:
-
-	node ../../UFFRemover optimize_file_browser bundle.js profiling.txt
-	node ../UFFREMOVER-MASTER optimize_file_browser math.js profiling.txt
-
-> This step generates a new file, e.g. bundle-optimized.js
-
-In math.js example:
-
-![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/optimization.png)
-
-#### 8. Test your optimization file
-
-To test your optimized file you need to replace in your site the original file with the optimized file.
-
-For Example:
-
-Replace
-
-	<script src="bundle.js"></script>
-
-With
-
-	<script src="bundle-optimized.js"></script>
-
-VERY IMPORTANT! Additionally, in the place where the file was optimized, the optimizer has created an "uff" folder with all optimized functions inside it. You also need to deploy that folder on the server so that the asynchronous load can find the functions.
-
-> Note: Please check that the application has access to the "uff" folder. The ajax call will try to load the functions from the root. The path to the file look like this: $dl ('uff/$_-7697924661507122750048.js').
-
-In math.js example:
-
-![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/replace-optimized.png)
-
-
-Also you can test the UFFs that were cropped from the bundle.
-
-For example, in the math.js experiment you can try (in your page, or in the browser developer console):
-
-	math.multiply(math.eye(1000, 1000, 'sparse'), math.eye(1000, 1000, 'sparse'));
-
-You should not see any error.
-
-If you want to see that functions were loaded lazily, you must put in the browser developer console the code:
-
-	window.uffs
-
-![image](https://github.com/hcvazquez/UFFRemover/blob/master/experiment/img/testing-optimization.png)
+We have optimized the original code of sample website (math.js) using following 
+command node [D:\fidelity\UFFRemover-master] optimize_file_browser [math.js] [profiling.txt] 
+This step generates a new file, e.g. math-optimized.js
